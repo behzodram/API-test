@@ -5,275 +5,200 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flask API Monitor</title>
-
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: Arial, sans-serif
         }
 
         body {
             background: #111827;
-            color: #fff;
+            color: #fff
         }
 
         header {
             background: #1f2937;
-            padding: 15px 20px;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
+            gap: 10px;
+            flex-wrap: wrap
         }
 
-        header h2 {
-            font-size: 20px;
+        h2 {
+            font-size: 20px
         }
 
-        #clearAll {
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        button {
             background: #dc2626;
-            color: white;
+            color: #fff;
             border: none;
-            padding: 8px 15px;
+            padding: 8px 14px;
             border-radius: 6px;
-            cursor: pointer;
-        }
-
-        #clearAll:hover {
-            background: #b91c1c;
+            cursor: pointer
         }
 
         #container {
-            padding: 15px;
+            padding: 15px
         }
 
         .card {
-
             background: #1f2937;
-
             border-left: 4px solid #10b981;
-
             margin-bottom: 10px;
-
-            border-radius: 7px;
-
             padding: 10px;
-
+            border-radius: 6px
         }
 
         .top {
-
             display: flex;
-
             justify-content: space-between;
-
-            align-items: center;
-
-            margin-bottom: 5px;
-
-        }
-
-        .method {
-
-            font-weight: bold;
-
-            color: #22c55e;
-
-        }
-
-        .endpoint {
-
-            color: #60a5fa;
-
+            align-items: center
         }
 
         .time {
-
-            color: #9ca3af;
-
             font-size: 12px;
-
-        }
-
-        .remove {
-
-            background: #ef4444;
-
-            color: white;
-
-            border: none;
-
-            padding: 4px 10px;
-
-            border-radius: 5px;
-
-            cursor: pointer;
-
-            font-size: 12px;
-
-        }
-
-        .remove:hover {
-
-            background: #dc2626;
-
+            color: #aaa;
+            margin-top: 4px
         }
 
         pre {
-
             background: #111827;
-
-            color: #d1d5db;
-
             padding: 8px;
-
             border-radius: 5px;
-
-            overflow: auto;
-
+            margin-top: 8px;
             font-size: 12px;
+            overflow: auto;
+            max-height: 130px
+        }
 
-            margin-top: 7px;
-
-            max-height: 130px;
-
+        .remove {
+            background: #ef4444;
+            padding: 4px 8px;
+            font-size: 12px
         }
     </style>
-
 </head>
 
 <body>
-
     <header>
-
         <h2>📡 Flask API Monitor</h2>
-
-        <button id="clearAll">
-            Clear All
-        </button>
-
+        <div class="controls">
+            <label><input type="checkbox" id="browserNotify" checked> Browser</label>
+            <label><input type="checkbox" id="soundNotify" checked> Sound</label>
+            <button id="testSound">Test</button>
+            <button id="clearAll">Clear All</button>
+        </div>
     </header>
 
     <div id="container"></div>
 
     <script>
-
         Notification.requestPermission();
 
-        const notifySound = new Audio("/static/notify.mp3");
-        notifySound.preload = "auto";
-
+        const browserNotify = document.getElementById("browserNotify");
+        const soundNotify = document.getElementById("soundNotify");
         const container = document.getElementById("container");
 
+        // let latestId = 0;
+        let audioBuffer = null;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        async function loadSound() {
+            try {
+                const r = await fetch("/static/notify.mp3");
+                const b = await r.arrayBuffer();
+                audioBuffer = await audioCtx.decodeAudioData(b);
+            } catch (e) { console.log(e); }
+        }
+        loadSound();
+
+        async function unlockAudio() {
+            if (audioCtx.state === "suspended") await audioCtx.resume();
+        }
+        document.addEventListener("click", unlockAudio, { once: true });
+        document.addEventListener("keydown", unlockAudio, { once: true });
+
         function beep() {
+            if (!soundNotify.checked || !audioBuffer) return;
+            const src = audioCtx.createBufferSource();
+            src.buffer = audioBuffer;
+            src.connect(audioCtx.destination);
+            src.start(0);
+        }
 
-            notifySound.currentTime = 0;
-
-            notifySound.play().catch(() => { });
-
+        function notify(log) {
+            if (browserNotify.checked && Notification.permission === "granted") {
+                new Notification("Yangi API", {
+                    body: `${log.method} ${log.endpoint}`
+                });
+            }
+            beep();
         }
 
         function createCard(log) {
-
             const card = document.createElement("div");
-
             card.className = "card";
-
             card.innerHTML = `
-
     <div class="top">
-
-        <div>
-
-            <span class="method">${log.method}</span>
-
-            |
-
-            <span class="endpoint">${log.endpoint}</span>
-
-        </div>
-
-        <button class="remove">
-
-            Remove
-
-        </button>
-
+      <div><b>${log.method}</b> | ${log.endpoint}</div>
+      <button class="remove">Remove</button>
     </div>
-
-    <div class="time">
-
-        ${log.time}
-
-        |
-
-        ${log.ip}
-
-    </div>
-
-    <pre>${JSON.stringify(log.body, null, 2)}</pre>
-
-    `;
-
-            card.querySelector(".remove").onclick = function () {
-
-                card.remove();
-
-            };
-
+    <div class="time">${log.time} | ${log.ip}</div>
+    <pre>${JSON.stringify(log.body, null, 2)}</pre>`;
+            card.querySelector(".remove").onclick = () => card.remove();
             container.prepend(card);
-
         }
 
         let latestId = 0;
+        let initialized = false;
 
-        function loadLogs() {
+        function loadLogs(){
 
             fetch("/logs")
-                .then(r => r.json())
-                .then(data => {
 
-                    data.reverse().forEach(log => {
+            .then(r=>r.json())
 
-                        if (log.id > latestId) {
+            .then(data=>{
 
-                            latestId = log.id;
+                data.reverse().forEach(log=>{
 
-                            createCard(log);
+                    if(log.id > latestId){
 
-                            beep();
+                        latestId = log.id;
 
-                            if (Notification.permission === "granted") {
+                        createCard(log);
 
-                                new Notification("Yangi API So'rovi", {
-                                    body: `${log.method} ${log.endpoint}`
-                                });
-
-                            }
-
+                        // Faqat sahifa yuklangandan keyingi loglar uchun
+                        if(initialized){
+                            notify(log);
                         }
 
-                    });
+                    }
 
                 });
 
+                initialized = true;
+
+            });
+
         }
-
         loadLogs();
-
         setInterval(loadLogs, 1000);
 
-        document.getElementById("clearAll").onclick = function () {
-
-            container.innerHTML = "";
-
-        };
-
+        document.getElementById("clearAll").onclick = () => container.innerHTML = "";
+        document.getElementById("testSound").onclick = () => beep();
     </script>
-
 </body>
 
 </html>

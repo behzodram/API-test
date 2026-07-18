@@ -1,3 +1,4 @@
+v 1.0.3 => main: web uchun tizim notify va browser notify ajraldi.
 v 1.0.2 => main: Flask uchun SSE stream olib tashlandi v1 versiya for web.
 v 1.0.1 => main: LiveKit Laziza uchun tayyorlangan 2ta POST url tayyor.
 v 1.0.0 => main: tizim bildirishnomasi avto ishladi. URL-test.txt
