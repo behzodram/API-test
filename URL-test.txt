@@ -1,2 +1,22 @@
-http://127.0.0.1:5000/api/user/behzod
-http://127.0.0.1:5000/api/hello
+Terminalda ishlatiladi:
+
+POST 1
+
+curl -X POST http://127.0.0.1:5000/api/mijoz_kimligini_aniqlash \
+-H "Content-Type: application/json" \
+-d '{
+    "mijoz_ismi":"Ali",
+    "mijoz_kasbi":"Haydovchi"
+}'
+
+
+
+POST 2
+
+curl -X POST http://127.0.0.1:5000/api/haydovchi_malumot_saqlash \
+-H "Content-Type: application/json" \
+-d '{
+    "mijoz_ismi":"Ali",
+    "mijoz_lokatsiyasi":"Toshkent",
+    "mijoz_maqsad_yuki_lokatsiyasi":"Buxoro"
+}'

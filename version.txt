@@ -1,1 +1,2 @@
+v 1.0.1 => main: LiveKit Laziza uchun tayyorlangan 2ta POST url tayyor.
 v 1.0.0 => main: tizim bildirishnomasi avto ishladi. URL-test.txt
