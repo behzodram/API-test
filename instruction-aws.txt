@@ -1,0 +1,14 @@
+3-qadam
+
+AWS Console → EC2 → Instance → Security → Security Groups → Inbound rules
+
+5000-port uchun quyidagiga o'xshash qoida bo'lishi kerak:
+
+Type	Protocol	Port	Source
+Custom  TCP	TCP	    5000	0.0.0.0/0
+
+Agar yo'q bo'lsa, qo'shing.
+
+
+CMD:
+gunicorn --bind 0.0.0.0:5000 app:app

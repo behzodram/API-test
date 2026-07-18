@@ -23,7 +23,6 @@ def add_log(method, endpoint, body):
 
     logs.insert(0, log)
 
-    # Faqat oxirgi 300 ta logni saqlaymiz
     if len(logs) > 300:
         logs.pop()
 
@@ -39,68 +38,90 @@ def get_logs():
 
 
 ##########################################################
-# TOOL 1
+# UNIVERSAL TOOL
 ##########################################################
 
-@app.route("/api/mijoz_kimligini_aniqlash", methods=["POST"])
-def mijoz_kimligini_aniqlash():
+@app.route("/api/tool", methods=["POST"])
+def tool():
 
-    data = request.get_json(silent=True)
+    data = request.get_json(silent=True) or {}
 
-    if data is None:
-        data = {}
+    ##########################################################
+    # UMUMIY MAYDONLAR
+    ##########################################################
 
-    mijoz_ismi = data.get("mijoz_ismi", "space")
-    mijoz_kasbi = data.get("mijoz_kasbi", "")
+    agent_id = data.get("agent_id", "unknown")
+
+    tool_name = data.get("tool", "")
+
+    ##########################################################
+    # LOG
+    ##########################################################
 
     add_log(
         "POST",
-        "/api/mijoz_kimligini_aniqlash",
-        {
-            "mijoz_ismi": mijoz_ismi,
-            "mijoz_kasbi": mijoz_kasbi
-        }
+        "/api/tool",
+        data
     )
+
+    ##########################################################
+    # TOOL ROUTER
+    ##########################################################
+
+    if tool_name == "mijoz_kimligini_aniqlash":
+
+        mijoz_ismi = data.get("mijoz_ismi", "space")
+
+        mijoz_kasbi = data.get("mijoz_kasbi", "")
+
+        print(
+            f"[{agent_id}]",
+            "Mijoz:",
+            mijoz_ismi,
+            "| Kasbi:",
+            mijoz_kasbi
+        )
+
+        return jsonify({
+            "success": True,
+            "tool": tool_name
+        })
+
+    ##########################################################
+
+    elif tool_name == "haydovchi_malumot_saqlash":
+
+        ism = data.get("mijoz_ismi", "")
+
+        lokatsiya = data.get(
+            "mijoz_lokatsiyasi",
+            ""
+        )
+
+        manzil = data.get(
+            "mijoz_maqsad_yuki_lokatsiyasi",
+            ""
+        )
+
+        print(
+            f"[{agent_id}]",
+            ism,
+            lokatsiya,
+            "->",
+            manzil
+        )
+
+        return jsonify({
+            "success": True,
+            "tool": tool_name
+        })
+
+    ##########################################################
 
     return jsonify({
-        "success": True,
-        "message": "Ma'lumot qabul qilindi."
-    })
-
-
-##########################################################
-# TOOL 2
-##########################################################
-
-@app.route("/api/haydovchi_malumot_saqlash", methods=["POST"])
-def haydovchi_malumot_saqlash():
-
-    data = request.get_json(silent=True)
-
-    if data is None:
-        data = {}
-
-    mijoz_ismi = data.get("mijoz_ismi", "")
-    mijoz_lokatsiyasi = data.get("mijoz_lokatsiyasi", "")
-    mijoz_maqsad_yuki_lokatsiyasi = data.get(
-        "mijoz_maqsad_yuki_lokatsiyasi",
-        ""
-    )
-
-    add_log(
-        "POST",
-        "/api/haydovchi_malumot_saqlash",
-        {
-            "mijoz_ismi": mijoz_ismi,
-            "mijoz_lokatsiyasi": mijoz_lokatsiyasi,
-            "mijoz_maqsad_yuki_lokatsiyasi": mijoz_maqsad_yuki_lokatsiyasi
-        }
-    )
-
-    return jsonify({
-        "success": True,
-        "message": "Haydovchi ma'lumoti saqlandi."
-    })
+        "success": False,
+        "message": "Unknown tool."
+    }), 400
 
 
 if __name__ == "__main__":

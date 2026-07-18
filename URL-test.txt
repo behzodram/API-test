@@ -1,48 +1,92 @@
-SSE stream olib tashlangan va yengil ishlaydi
-
-Terminalda ishlatiladi:
-REMOTE:
-
-POST 1
-
-curl -X POST https://behzod.pythonanywhere.com/api/mijoz_kimligini_aniqlash \
--H "Content-Type: application/json" \
--d '{
-    "mijoz_ismi":"Ali",
-    "mijoz_kasbi":"Haydovchi"
-}'
-
-
-
-POST 2
-
-curl -X POST https://behzod.pythonanywhere.com/api/haydovchi_malumot_saqlash \
--H "Content-Type: application/json" \
--d '{
-    "mijoz_ismi":"Ali",
-    "mijoz_lokatsiyasi":"Toshkent",
-    "mijoz_maqsad_yuki_lokatsiyasi":"Buxoro"
-}'
+1) mijoz_kimligini_aniqlash
 
 LOCAL:
 
-POST 1
-
-curl -X POST http://127.0.0.1:5000/api/mijoz_kimligini_aniqlash \
+curl -X POST http://127.0.0.1:5000/api/tool \
 -H "Content-Type: application/json" \
 -d '{
+    "agent_id":"laziza",
+    "tool":"mijoz_kimligini_aniqlash",
+    "mijoz_ismi":"Ali",
+    "mijoz_kasbi":"Haydovchi"
+}'
+
+
+AWS remote:
+
+POST 1
+
+curl -X POST http://16.171.31.78:5000/api/tool \
+-H "Content-Type: application/json" \
+-d '{
+    "agent_id":"laziza",
+    "tool":"mijoz_kimligini_aniqlash",
     "mijoz_ismi":"Ali",
     "mijoz_kasbi":"Haydovchi"
 }'
 
 
 
-POST 2
 
-curl -X POST http://127.0.0.1:5000/api/haydovchi_malumot_saqlash \
+
+2) haydovchi_malumot_saqlash
+
+Lokal:
+
+curl -X POST http://127.0.0.1:5000/api/tool \
 -H "Content-Type: application/json" \
 -d '{
+    "agent_id":"laziza",
+    "tool":"haydovchi_malumot_saqlash",
     "mijoz_ismi":"Ali",
     "mijoz_lokatsiyasi":"Toshkent",
     "mijoz_maqsad_yuki_lokatsiyasi":"Buxoro"
+}'
+
+AWS:
+
+curl -X POST http://16.171.31.78:5000/api/tool \
+-H "Content-Type: application/json" \
+-d '{
+    "agent_id":"laziza",
+    "tool":"haydovchi_malumot_saqlash",
+    "mijoz_ismi":"Ali",
+    "mijoz_lokatsiyasi":"Toshkent",
+    "mijoz_maqsad_yuki_lokatsiyasi":"Buxoro"
+}'
+
+
+
+
+3) Ismi noma'lum mijoz
+
+Agar mijoz hali ismini aytmagan bo'lsa:
+
+curl -X POST http://127.0.0.1:5000/api/tool \
+-H "Content-Type: application/json" \
+-d '{
+    "agent_id":"laziza",
+    "tool":"mijoz_kimligini_aniqlash",
+    "mijoz_ismi":"space",
+    "mijoz_kasbi":"Haydovchi"
+}'
+
+
+
+
+4) Keyinchalik yangi tool qo'shilsa
+
+Masalan siz yangi tool qo'shdingiz:
+
+yuk_qidirish
+
+unda curl faqat tool qiymati bilan farq qiladi:
+
+curl -X POST http://127.0.0.1:5000/api/tool \
+-H "Content-Type: application/json" \
+-d '{
+    "agent_id":"laziza",
+    "tool":"yuk_qidirish",
+    "yuk_turi":"sement",
+    "lokatsiya":"Samarqand"
 }'
