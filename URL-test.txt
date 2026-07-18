@@ -1,22 +1,16 @@
 Terminalda ishlatiladi:
 
+LOCAL:
 POST 1
-
-curl -X POST http://127.0.0.1:5000/api/mijoz_kimligini_aniqlash \
--H "Content-Type: application/json" \
--d '{
-    "mijoz_ismi":"Ali",
-    "mijoz_kasbi":"Haydovchi"
-}'
-
-
+http://127.0.0.1:5000/api/hello
 
 POST 2
+http://127.0.0.1:5000/api/user/behzod
 
-curl -X POST http://127.0.0.1:5000/api/haydovchi_malumot_saqlash \
--H "Content-Type: application/json" \
--d '{
-    "mijoz_ismi":"Ali",
-    "mijoz_lokatsiyasi":"Toshkent",
-    "mijoz_maqsad_yuki_lokatsiyasi":"Buxoro"
-}'
+
+REMOTELY:
+POST 1
+https://behzod.pythonanywhere.com/api/hello
+
+POST 2
+https://behzod.pythonanywhere.com/api/user/behzod
