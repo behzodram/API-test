@@ -1,16 +1,48 @@
+SSE stream olib tashlangan va yengil ishlaydi
+
 Terminalda ishlatiladi:
+REMOTE:
+
+POST 1
+
+curl -X POST https://behzod.pythonanywhere.com/api/mijoz_kimligini_aniqlash \
+-H "Content-Type: application/json" \
+-d '{
+    "mijoz_ismi":"Ali",
+    "mijoz_kasbi":"Haydovchi"
+}'
+
+
+
+POST 2
+
+curl -X POST https://behzod.pythonanywhere.com/api/haydovchi_malumot_saqlash \
+-H "Content-Type: application/json" \
+-d '{
+    "mijoz_ismi":"Ali",
+    "mijoz_lokatsiyasi":"Toshkent",
+    "mijoz_maqsad_yuki_lokatsiyasi":"Buxoro"
+}'
 
 LOCAL:
+
 POST 1
-http://127.0.0.1:5000/api/hello
+
+curl -X POST http://127.0.0.1:5000/api/mijoz_kimligini_aniqlash \
+-H "Content-Type: application/json" \
+-d '{
+    "mijoz_ismi":"Ali",
+    "mijoz_kasbi":"Haydovchi"
+}'
+
+
 
 POST 2
-http://127.0.0.1:5000/api/user/behzod
 
-
-REMOTELY:
-POST 1
-https://behzod.pythonanywhere.com/api/hello
-
-POST 2
-https://behzod.pythonanywhere.com/api/user/behzod
+curl -X POST http://127.0.0.1:5000/api/haydovchi_malumot_saqlash \
+-H "Content-Type: application/json" \
+-d '{
+    "mijoz_ismi":"Ali",
+    "mijoz_lokatsiyasi":"Toshkent",
+    "mijoz_maqsad_yuki_lokatsiyasi":"Buxoro"
+}'
